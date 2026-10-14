@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bfas"
+version = "0.1.0"
+description = "Bandwidth-first architecture selection for small language models"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.4",
+    "numpy>=1.26",
+    "transformers>=4.44",
+    "datasets>=2.20",
+    "accelerate>=0.33",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+    "pandas>=2.2",
+    "matplotlib>=3.8",
+    "psutil>=5.9",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,90 @@
+# Default configuration for the bandwidth-first architecture study.
+# Everything the paper reports should be traceable to a config like this one.
+
+device:
+  # Fill achievable_gbs in from `python -m bfas.bandwidth`. Never copy a number
+  # off a spec sheet into this field.
+  achievable_gbs: null
+  # Fraction of achievable bandwidth your engine reaches. Fit it once with
+  # `python -m bfas.benchmark`, then keep it fixed across architectures.
+  engine_efficiency: 0.7
+  torch_device: cpu
+  dtype: float32
+
+workload:
+  # The latency target the selector has to satisfy.
+  target_tokens_per_s: 30
+  # Context lengths you care about, and how often each occurs. These weights
+  # matter: a selector tuned to one context length overfits to it.
+  context_lens: [512, 2048, 4096]
+  context_weights: [0.5, 0.35, 0.15]
+  memory_limit_gb: 2.0
+
+data:
+  dataset: HuggingFaceFW/fineweb-edu
+  subset: sample-10BT
+  tokenizer: HuggingFaceTB/SmolLM2-135M
+  # Start at 50M tokens. Raise it once the pipeline is proven end to end.
+  n_tokens: 50000000
+  cache_dir: data
+  tag: fineweb
+
+train:
+  # The matched token budget every shape in the grid receives. Identical for
+  # every shape, or the comparison is not controlled.
+  token_budget: 50000000
+  seq_len: 512
+  batch_size: 8
+  grad_accum: 4
+  lr: 0.0003
+  min_lr_ratio: 0.1
+  warmup_ratio: 0.02
+  weight_decay: 0.1
+  grad_clip: 1.0
+  seed: 0
+  eval_every: 200
+  eval_batches: 20
+  out_dir: results/runs
+
+benchmark:
+  contexts: [128, 512, 2048, 8192]
+  new_tokens: 32
+  repeats: 3
+  out: results/decode_benchmark.csv
+
+# The shapes trained in week 3 and 4. Two frontiers: one at matched parameter
+# count (the convention) and one at matched bytes per token (the contribution).
+shapes:
+  iso_parameter:
+    - tiny-60m-mha
+    - tiny-60m-gqa2
+    - tiny-60m-deep
+    - tiny-60m-wide
+  iso_bytes:
+    - tiny-60m-gqa2
+    - tiny-60m-latent
+    - small-140m-gqa4
+
+select:
+  top_k: 5
+  # Point this at results/runs once at least three shapes have trained, so the
+  # quality model is fitted rather than assumed.
+  fit_from: null
+  out: results/selection.json
+
+# Published models to price with the cost model. Config only, no weights
+# downloaded, so this runs in seconds.
+off_the_shelf:
+  - HuggingFaceTB/SmolLM2-135M
+  - HuggingFaceTB/SmolLM2-360M
+  - Qwen/Qwen2.5-0.5B
+  - EleutherAI/pythia-410m
+  - TinyLlama/TinyLlama-1.1B-Chat-v1.0
+  - allenai/OLMo-2-0425-1B
+  - Qwen/Qwen2.5-1.5B
+  - HuggingFaceTB/SmolLM2-1.7B
+  - Qwen/Qwen2.5-3B
+  - microsoft/Phi-3-mini-4k-instruct
+  # Gated: accept the licence and run `huggingface-cli login` first.
+  # - meta-llama/Llama-3.2-1B
+  # - google/gemma-3-270m

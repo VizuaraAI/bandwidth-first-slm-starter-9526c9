@@ -1,0 +1,21 @@
+# Core. Pinned to lower bounds that are current as of this kit; newer is fine.
+torch>=2.4
+numpy>=1.26
+transformers>=4.44
+datasets>=2.20
+tokenizers>=0.19
+accelerate>=0.33
+safetensors>=0.4
+pyyaml>=6.0
+tqdm>=4.66
+pandas>=2.2
+matplotlib>=3.8
+psutil>=5.9
+
+# Evaluation beyond perplexity. Install when you reach week 5.
+# lm-eval>=0.4.4
+
+# Optional, for benchmarking quantized weights on a production engine.
+# Install only if your machine supports them.
+# llama-cpp-python>=0.3.0
+# bitsandbytes>=0.43

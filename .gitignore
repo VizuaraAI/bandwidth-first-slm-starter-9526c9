@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+data/
+results/
+!results/*.csv
+*.pt
+*.npy
+.DS_Store
